@@ -363,7 +363,7 @@
   "@supermarketList": {
     "description": "Title for the supermarkets list screen. Used in: lib/UI/home.dart -> displays available supermarkets (supermarketList)."
   },
-  "aisles": "Aisles",
+  "aisles": "Gänge",
   "@aisles": {
     "description": "Label for aisles list (Aisles). Also used as a data key in environment serialization (packages/lista_de_la_compra_backend/.../environment_serializer.dart)."
   },
@@ -374,7 +374,7 @@
       "count": {}
     }
   },
-  "numberOfAisles": "{count, plural, =0{No aisles} =1{1 aisle} other{{count} aisles}}",
+  "numberOfAisles": "{count, plural, =0{Keine Gänge} =1{1 Gang} other{{count} Gänge}}",
   "@numberOfAisles": {
     "description": "Pluralized message for number of aisles. Intended to be used where aisle counts are shown. Not referenced directly in codebase currently.",
     "placeholders": {

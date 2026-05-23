@@ -285,7 +285,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get supermarketList => 'Supermarket list';
 
   @override
-  String get aisles => 'Aisles';
+  String get aisles => 'Gänge';
 
   @override
   String numberOfProducts(num count) {
@@ -304,9 +304,9 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count aisles',
-      one: '1 aisle',
-      zero: 'No aisles',
+      other: '$count Gänge',
+      one: '1 Gang',
+      zero: 'Keine Gänge',
     );
     return '$_temp0';
   }
