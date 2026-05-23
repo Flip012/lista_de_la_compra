@@ -4670,6 +4670,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<int> updatedAt,
       Value<int?> deletedAt,
       required String enviromentId,
+      Value<String?> amount,
       Value<int> rowid,
     });
 typedef $$ProductsTableUpdateCompanionBuilder =
@@ -4680,6 +4681,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<int> updatedAt,
       Value<int?> deletedAt,
       Value<String> enviromentId,
+      Value<String?> amount,
       Value<int> rowid,
     });
 
@@ -4777,6 +4779,11 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<int> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get amount => $composableBuilder(
+    column: $table.amount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4888,6 +4895,11 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$EnviromentsTableOrderingComposer get enviromentId {
     final $$EnviromentsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4935,6 +4947,9 @@ class $$ProductsTableAnnotationComposer
 
   GeneratedColumn<int> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
 
   $$EnviromentsTableAnnotationComposer get enviromentId {
     final $$EnviromentsTableAnnotationComposer composer = $composerBuilder(
@@ -5048,6 +5063,7 @@ class $$ProductsTableTableManager
                 Value<int> updatedAt = const Value.absent(),
                 Value<int?> deletedAt = const Value.absent(),
                 Value<String> enviromentId = const Value.absent(),
+                Value<String?> amount = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductsCompanion(
                 id: id,
@@ -5056,6 +5072,7 @@ class $$ProductsTableTableManager
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
                 enviromentId: enviromentId,
+                amount: amount,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5066,6 +5083,7 @@ class $$ProductsTableTableManager
                 Value<int> updatedAt = const Value.absent(),
                 Value<int?> deletedAt = const Value.absent(),
                 required String enviromentId,
+                Value<String?> amount = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductsCompanion.insert(
                 id: id,
@@ -5074,6 +5092,7 @@ class $$ProductsTableTableManager
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
                 enviromentId: enviromentId,
+                amount: amount,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
