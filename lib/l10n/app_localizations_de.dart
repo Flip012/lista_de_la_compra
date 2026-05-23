@@ -288,6 +288,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aisles => 'Gänge';
 
   @override
+  String get noAisleAssigned => 'Kein Gang zugewiesen';
+
+  @override
   String numberOfProducts(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

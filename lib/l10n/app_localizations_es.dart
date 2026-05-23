@@ -289,6 +289,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get aisles => 'Aisles';
 
   @override
+  String get noAisleAssigned => 'Sin pasillo asignado';
+
+  @override
   String numberOfProducts(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -3,6 +3,7 @@ import 'package:lista_de_la_compra/UI/common/needed_checkbox.dart';
 import 'package:lista_de_la_compra/UI/common/searchable_list_view.dart';
 import 'package:lista_de_la_compra/UI/products/common.dart';
 import 'package:lista_de_la_compra/UI/products/product_detail.dart';
+import 'package:lista_de_la_compra/l10n/app_localizations.dart';
 import 'package:lista_de_la_compra/shared_preference_providers/persistant_shared_preferences_provider.dart';
 import 'package:lista_de_la_compra_backend/lista_de_la_compra_backend.dart';
 import 'package:provider/provider.dart';
@@ -24,46 +25,55 @@ class ProductListDisplay extends StatelessWidget {
 
     var filteredProducts = isNeededList ? products.where((e) => e.needed).toList() : products;
 
-    return Searchablelistview<Product>(
-      elements: filteredProducts,
-      elementsOnSearch: products,
-      elementToListTile: (Product p, RichText tag) {
-        return ListTile(
-          title: tag,
-          subtitle: getNeededAmount(scheduleProvider, p.id),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              NeededCheckbox(p.id, delay: isNeededList ? Duration(milliseconds: 200) : null),
-              IconButton(
-                icon: const Icon(Icons.arrow_outward),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetail(p.id)));
-                },
+    return FutureBuilder<String?>(
+      future: sharedPreferencesProvider.getSelectedSupermarket(enviromentId),
+      builder: (context, supermarketSnapshot) {
+        final AppLocalizations appLoc = AppLocalizations.of(context)!;
+        final String? uncategorizedLabel = supermarketSnapshot.data != null ? appLoc.noAisleAssigned : null;
+
+        return Searchablelistview<Product>(
+          uncategorizedLabel: uncategorizedLabel,
+          elements: filteredProducts,
+          elementsOnSearch: products,
+          elementToListTile: (Product p, RichText tag) {
+            return ListTile(
+              title: tag,
+              subtitle: getNeededAmount(scheduleProvider, p.id),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  NeededCheckbox(p.id, delay: isNeededList ? Duration(milliseconds: 200) : null),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_outward),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetail(p.id)));
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
+          elementToTag: (Product p) => p.name,
+          newElement: (String name) async {
+            var allProducts = await productProvider.getDisplayProductList(enviromentId);
+            if (allProducts.any((e) => e.name.toLowerCase() == name.toLowerCase())) {
+              var referenced = allProducts.firstWhere((e) => e.name.toLowerCase() == name.toLowerCase());
+              productProvider.setProductNeededness(referenced.id, isNeededList);
+            } else {
+              productProvider.addProduct(name, isNeededList, enviromentId);
+            }
+          },
+          elementCategories: (Product p) async {
+            String? selectedSupermarket = await sharedPreferencesProvider.getSelectedSupermarket(enviromentId);
+
+            if (selectedSupermarket == null) {
+              return [];
+            }
+
+            var aisles = await productAisleProvider.getAisleOfProductInSupermarket(p.id, selectedSupermarket);
+            return aisles.map((a) => (a.id, a.name)).toList();
+          },
         );
-      },
-      elementToTag: (Product p) => p.name,
-      newElement: (String name) async {
-        var allProducts = await productProvider.getDisplayProductList(enviromentId);
-        if (allProducts.any((e) => e.name.toLowerCase() == name.toLowerCase())) {
-          var referenced = allProducts.firstWhere((e) => e.name.toLowerCase() == name.toLowerCase());
-          productProvider.setProductNeededness(referenced.id, isNeededList);
-        } else {
-          productProvider.addProduct(name, isNeededList, enviromentId);
-        }
-      },
-      elementCategories: (Product p) async {
-        String? selectedSupermarket = await sharedPreferencesProvider.getSelectedSupermarket(enviromentId);
-
-        if (selectedSupermarket == null) {
-          return [];
-        }
-
-        var aisles = await productAisleProvider.getAisleOfProductInSupermarket(p.id, selectedSupermarket);
-        return aisles.map((a) => (a.id, a.name)).toList();
       },
     );
   }

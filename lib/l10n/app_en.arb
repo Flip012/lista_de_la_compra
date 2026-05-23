@@ -374,6 +374,10 @@
       "count": {}
     }
   },
+  "noAisleAssigned": "No aisle assigned",
+  "@noAisleAssigned": {
+    "description": "Header for products that belong to the selected supermarket but have no aisle assigned. Used in: lib/UI/products/product_list_display.dart (passed as Searchablelistview.uncategorizedLabel)."
+  },
   "numberOfAisles": "{count, plural, =0{No aisles} =1{1 aisle} other{{count} aisles}}",
   "@numberOfAisles": {
     "description": "Pluralized message for number of aisles. Intended to be used where aisle counts are shown. Not referenced directly in codebase currently.",
