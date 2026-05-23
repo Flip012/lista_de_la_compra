@@ -292,9 +292,9 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count products',
-      one: '1 product',
-      zero: 'No products',
+      other: '$count Produkte',
+      one: '1 Produkt',
+      zero: 'Keine Produkte',
     );
     return '$_temp0';
   }
@@ -315,7 +315,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addProductsToAisle => 'Produkte zum Gang hinzufügen';
 
   @override
-  String get selectSupermarket => 'Select Supermarket...';
+  String get selectSupermarket => 'Supermarkt auswählen...';
 
   @override
   String get exportToICS => 'Als ICS exportieren';
