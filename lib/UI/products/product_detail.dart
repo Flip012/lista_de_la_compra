@@ -73,8 +73,6 @@ class ProductDetail extends StatelessWidget {
       },
     );
 
-    ScheduleProvider scheduleProvider = context.watch<FlutterScheduleProvider>();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
@@ -149,7 +147,7 @@ class ProductDetail extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  getNeededAmount(scheduleProvider, productId)!,
+                  ProductAmount(productId),
                   TextButton(
                     onPressed: () async {
                       var product = (await productFuture);

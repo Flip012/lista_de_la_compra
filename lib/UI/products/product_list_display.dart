@@ -18,7 +18,6 @@ class ProductListDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScheduleProvider scheduleProvider = context.watch<FlutterScheduleProvider>();
     final ProductProvider productProvider = context.watch<FlutterProductProvider>();
     final SharedPreferencesProvider sharedPreferencesProvider = context.watch<PersistantSharedPreferencesProvider>();
     final ProductAisleProvider productAisleProvider = context.watch<FlutterProductAisleProvider>();
@@ -38,7 +37,7 @@ class ProductListDisplay extends StatelessWidget {
           elementToListTile: (Product p, RichText tag) {
             return ListTile(
               title: tag,
-              subtitle: getNeededAmount(scheduleProvider, p.id),
+              subtitle: ProductAmount(p.id),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

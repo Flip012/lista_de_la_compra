@@ -1102,6 +1102,15 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       'REFERENCES enviroments (id)',
     ),
   );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<String> amount = GeneratedColumn<String>(
+    'amount',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1110,6 +1119,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     updatedAt,
     deletedAt,
     enviromentId,
+    amount,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1165,6 +1175,12 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     } else if (isInserting) {
       context.missing(_enviromentIdMeta);
     }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    }
     return context;
   }
 
@@ -1198,6 +1214,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}enviroment_id'],
       )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}amount'],
+      ),
     );
   }
 
@@ -1214,6 +1234,7 @@ class Product extends DataClass implements Insertable<Product> {
   final int updatedAt;
   final int? deletedAt;
   final String enviromentId;
+  final String? amount;
   const Product({
     required this.id,
     required this.name,
@@ -1221,6 +1242,7 @@ class Product extends DataClass implements Insertable<Product> {
     required this.updatedAt,
     this.deletedAt,
     required this.enviromentId,
+    this.amount,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1233,6 +1255,9 @@ class Product extends DataClass implements Insertable<Product> {
       map['deleted_at'] = Variable<int>(deletedAt);
     }
     map['enviroment_id'] = Variable<String>(enviromentId);
+    if (!nullToAbsent || amount != null) {
+      map['amount'] = Variable<String>(amount);
+    }
     return map;
   }
 
@@ -1246,6 +1271,9 @@ class Product extends DataClass implements Insertable<Product> {
           ? const Value.absent()
           : Value(deletedAt),
       enviromentId: Value(enviromentId),
+      amount: amount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(amount),
     );
   }
 
@@ -1261,6 +1289,7 @@ class Product extends DataClass implements Insertable<Product> {
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       enviromentId: serializer.fromJson<String>(json['enviromentId']),
+      amount: serializer.fromJson<String?>(json['amount']),
     );
   }
   @override
@@ -1273,6 +1302,7 @@ class Product extends DataClass implements Insertable<Product> {
       'updatedAt': serializer.toJson<int>(updatedAt),
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'enviromentId': serializer.toJson<String>(enviromentId),
+      'amount': serializer.toJson<String?>(amount),
     };
   }
 
@@ -1283,6 +1313,7 @@ class Product extends DataClass implements Insertable<Product> {
     int? updatedAt,
     Value<int?> deletedAt = const Value.absent(),
     String? enviromentId,
+    Value<String?> amount = const Value.absent(),
   }) => Product(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -1290,6 +1321,7 @@ class Product extends DataClass implements Insertable<Product> {
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     enviromentId: enviromentId ?? this.enviromentId,
+    amount: amount.present ? amount.value : this.amount,
   );
   Product copyWithCompanion(ProductsCompanion data) {
     return Product(
@@ -1301,6 +1333,7 @@ class Product extends DataClass implements Insertable<Product> {
       enviromentId: data.enviromentId.present
           ? data.enviromentId.value
           : this.enviromentId,
+      amount: data.amount.present ? data.amount.value : this.amount,
     );
   }
 
@@ -1312,14 +1345,22 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('needed: $needed, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
-          ..write('enviromentId: $enviromentId')
+          ..write('enviromentId: $enviromentId, ')
+          ..write('amount: $amount')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, needed, updatedAt, deletedAt, enviromentId);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    needed,
+    updatedAt,
+    deletedAt,
+    enviromentId,
+    amount,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1329,7 +1370,8 @@ class Product extends DataClass implements Insertable<Product> {
           other.needed == this.needed &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
-          other.enviromentId == this.enviromentId);
+          other.enviromentId == this.enviromentId &&
+          other.amount == this.amount);
 }
 
 class ProductsCompanion extends UpdateCompanion<Product> {
@@ -1339,6 +1381,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int> updatedAt;
   final Value<int?> deletedAt;
   final Value<String> enviromentId;
+  final Value<String?> amount;
   final Value<int> rowid;
   const ProductsCompanion({
     this.id = const Value.absent(),
@@ -1347,6 +1390,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.enviromentId = const Value.absent(),
+    this.amount = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProductsCompanion.insert({
@@ -1356,6 +1400,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
     required String enviromentId,
+    this.amount = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : name = Value(name),
        needed = Value(needed),
@@ -1367,6 +1412,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<int>? updatedAt,
     Expression<int>? deletedAt,
     Expression<String>? enviromentId,
+    Expression<String>? amount,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1376,6 +1422,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (enviromentId != null) 'enviroment_id': enviromentId,
+      if (amount != null) 'amount': amount,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1387,6 +1434,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<int>? updatedAt,
     Value<int?>? deletedAt,
     Value<String>? enviromentId,
+    Value<String?>? amount,
     Value<int>? rowid,
   }) {
     return ProductsCompanion(
@@ -1396,6 +1444,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
       enviromentId: enviromentId ?? this.enviromentId,
+      amount: amount ?? this.amount,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1421,6 +1470,9 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (enviromentId.present) {
       map['enviroment_id'] = Variable<String>(enviromentId.value);
     }
+    if (amount.present) {
+      map['amount'] = Variable<String>(amount.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1436,6 +1488,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('enviromentId: $enviromentId, ')
+          ..write('amount: $amount, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
