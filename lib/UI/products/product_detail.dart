@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lista_de_la_compra/UI/common/searchable_list_view.dart';
 import 'package:lista_de_la_compra/UI/products/common.dart';
 import 'package:lista_de_la_compra/l10n/app_localizations.dart';
@@ -148,6 +149,23 @@ class ProductDetail extends StatelessWidget {
               child: Column(
                 children: [
                   ProductAmount(productId),
+                  FutureBuilder(
+                    future: productFuture,
+                    builder: (context, snapshot) {
+                      final Product? p = snapshot.data;
+                      if (p == null || (p.lastEditedBy ?? '').isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      final String date = DateFormat.yMd().add_Hm().format(DateTime.fromMillisecondsSinceEpoch(p.updatedAt));
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "${appLoc.lastEditedBy} ${p.lastEditedBy} · $date",
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      );
+                    },
+                  ),
                   TextButton(
                     onPressed: () async {
                       var product = (await productFuture);

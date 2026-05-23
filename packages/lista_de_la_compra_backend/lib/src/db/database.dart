@@ -20,7 +20,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -62,6 +62,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         // version 3 adds a free-text amount/quantity to products
         await customStatement('ALTER TABLE products ADD COLUMN amount TEXT;');
+      }
+      if (from < 4) {
+        // version 4 records the nick of the last editor on products
+        await customStatement('ALTER TABLE products ADD COLUMN last_edited_by TEXT;');
       }
     },
   );

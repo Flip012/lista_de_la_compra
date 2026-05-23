@@ -378,6 +378,10 @@
   "@noAisleAssigned": {
     "description": "Header for products that belong to the selected supermarket but have no aisle assigned. Used in: lib/UI/products/product_list_display.dart (passed as Searchablelistview.uncategorizedLabel)."
   },
+  "lastEditedBy": "Last edited by",
+  "@lastEditedBy": {
+    "description": "Label preceding the nick of the device that last edited a product. Shown in the product list (nick only) and the product detail view (nick + date)."
+  },
   "numberOfAisles": "{count, plural, =0{No aisles} =1{1 aisle} other{{count} aisles}}",
   "@numberOfAisles": {
     "description": "Pluralized message for number of aisles. Intended to be used where aisle counts are shown. Not referenced directly in codebase currently.",

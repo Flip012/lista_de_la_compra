@@ -12,6 +12,12 @@ extension StringExtension on String {
 class RamProductProvider extends ProductProvider with VoidEventSourceMixin {}
 
 abstract class ProductProvider implements VoidEventSource {
+  /// Source for the local device nick, stamped onto locally edited products.
+  /// Left null on headless instances (the server relays the original editor).
+  SharedPreferencesProvider? nickSource;
+
+  Future<String?> _currentNick() async => nickSource == null ? null : await nickSource!.getLocalNick();
+
   Future<String> addProduct(String rawName, bool needed, String enviromentId) async {
     final database = AppDatabaseSingleton.instance;
 
@@ -28,6 +34,7 @@ abstract class ProductProvider implements VoidEventSource {
             needed: Value(needed),
             enviromentId: Value(enviromentId),
             updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
+            lastEditedBy: Value(await _currentNick()),
           ),
         );
     notifyListeners();
@@ -49,6 +56,7 @@ abstract class ProductProvider implements VoidEventSource {
             deletedAt: Value(serializedProduct["deletedAt"]),
             enviromentId: Value(serializedProduct["enviromentId"]),
             amount: serializedProduct.containsKey("amount") ? Value(serializedProduct["amount"]) : const Value.absent(),
+            lastEditedBy: serializedProduct.containsKey("lastEditedBy") ? Value(serializedProduct["lastEditedBy"]) : const Value.absent(),
           ),
         );
     notifyListeners();
@@ -74,6 +82,7 @@ abstract class ProductProvider implements VoidEventSource {
         updatedAt: Value(serializedProduct["updatedAt"]),
         deletedAt: Value(serializedProduct["deletedAt"]),
         amount: serializedProduct.containsKey("amount") ? Value(serializedProduct["amount"]) : const Value.absent(),
+        lastEditedBy: serializedProduct.containsKey("lastEditedBy") ? Value(serializedProduct["lastEditedBy"]) : const Value.absent(),
       ),
     );
 
@@ -85,7 +94,9 @@ abstract class ProductProvider implements VoidEventSource {
 
     await (database.update(
       database.products,
-    )..where((table) => table.id.equals(id))).write(ProductsCompanion(deletedAt: Value(DateTime.now().millisecondsSinceEpoch)));
+    )..where((table) => table.id.equals(id))).write(
+      ProductsCompanion(deletedAt: Value(DateTime.now().millisecondsSinceEpoch), lastEditedBy: Value(await _currentNick())),
+    );
 
     notifyListeners();
   }
@@ -93,7 +104,7 @@ abstract class ProductProvider implements VoidEventSource {
   Future setProductNeededness(String id, bool needed) async {
     final database = AppDatabaseSingleton.instance;
     await (database.update(database.products)..where((table) => table.id.equals(id))).write(
-      ProductsCompanion(needed: Value(needed), updatedAt: Value(DateTime.now().millisecondsSinceEpoch)),
+      ProductsCompanion(needed: Value(needed), updatedAt: Value(DateTime.now().millisecondsSinceEpoch), lastEditedBy: Value(await _currentNick())),
     );
 
     notifyListeners();
@@ -103,7 +114,9 @@ abstract class ProductProvider implements VoidEventSource {
     final database = AppDatabaseSingleton.instance;
     await (database.update(
       database.products,
-    )..where((table) => table.id.equals(id))).write(ProductsCompanion(name: Value(name), updatedAt: Value(DateTime.now().millisecondsSinceEpoch)));
+    )..where((table) => table.id.equals(id))).write(
+      ProductsCompanion(name: Value(name), updatedAt: Value(DateTime.now().millisecondsSinceEpoch), lastEditedBy: Value(await _currentNick())),
+    );
 
     notifyListeners();
   }
@@ -113,7 +126,9 @@ abstract class ProductProvider implements VoidEventSource {
     final String? normalized = (amount != null && amount.trim().isEmpty) ? null : amount?.trim();
     await (database.update(
       database.products,
-    )..where((table) => table.id.equals(id))).write(ProductsCompanion(amount: Value(normalized), updatedAt: Value(DateTime.now().millisecondsSinceEpoch)));
+    )..where((table) => table.id.equals(id))).write(
+      ProductsCompanion(amount: Value(normalized), updatedAt: Value(DateTime.now().millisecondsSinceEpoch), lastEditedBy: Value(await _currentNick())),
+    );
 
     notifyListeners();
   }

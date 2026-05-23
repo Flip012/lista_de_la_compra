@@ -708,6 +708,12 @@ abstract class AppLocalizations {
   /// **'No aisle assigned'**
   String get noAisleAssigned;
 
+  /// Label preceding the nick of the device that last edited a product.
+  ///
+  /// In en, this message translates to:
+  /// **'Last edited by'**
+  String get lastEditedBy;
+
   /// Pluralized message for number of products. Intended to be used where product counts are shown. Not referenced directly in codebase currently.
   ///
   /// In en, this message translates to:
