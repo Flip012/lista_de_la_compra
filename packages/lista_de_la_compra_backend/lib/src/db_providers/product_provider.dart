@@ -5,7 +5,7 @@ import '../../lista_de_la_compra_backend.dart';
 
 extension StringExtension on String {
   String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }
 
