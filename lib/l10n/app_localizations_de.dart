@@ -282,7 +282,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fallbackLocalNick => 'unbenanntes-gerät';
 
   @override
-  String get supermarketList => 'Supermarket list';
+  String get supermarketList => 'Supermärkte';
 
   @override
   String get aisles => 'Gänge';

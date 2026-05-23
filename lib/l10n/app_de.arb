@@ -89,7 +89,7 @@
   "noOpenConnection": "Keine offenen Verbindungen",
   "neverConnected": "Nie verbunden",
   "fallbackLocalNick": "unbenanntes-gerät",
-  "supermarketList": "Supermarket list",
+  "supermarketList": "Supermärkte",
   "@ipCopied": {
     "description": "Message shown when an IP address is copied to the clipboard",
     "placeholders": {
