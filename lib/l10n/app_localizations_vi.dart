@@ -287,6 +287,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get aisles => 'Aisles';
 
   @override
+  String get noAisleAssigned => 'No aisle assigned';
+
+  @override
   String numberOfProducts(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

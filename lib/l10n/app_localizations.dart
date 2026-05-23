@@ -702,6 +702,12 @@ abstract class AppLocalizations {
   /// **'Aisles'**
   String get aisles;
 
+  /// Header for products that belong to the selected supermarket but have no aisle assigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No aisle assigned'**
+  String get noAisleAssigned;
+
   /// Pluralized message for number of products. Intended to be used where product counts are shown. Not referenced directly in codebase currently.
   ///
   /// In en, this message translates to:

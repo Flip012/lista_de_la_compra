@@ -46,23 +46,17 @@ class _SearchableListview<T> extends State<Searchablelistview<T>> {
       uncategorizedElements = elms;
     }
 
-    List<ListTile> ret = [];
-
-    if (uncategorizedElements.isNotEmpty) {
-      ret.addAll(
-        uncategorizedElements.map(
-          (e) => widget.elementToListTile(
-            e,
-            RichText(
-              text: TextSpan(
-                style: Theme.of(context).textTheme.bodyLarge,
-                children: [TextSpan(text: widget.elementToTag(e))],
-              ),
-            ),
-          ),
+    ListTile toTile(T e) => widget.elementToListTile(
+      e,
+      RichText(
+        text: TextSpan(
+          style: Theme.of(context).textTheme.bodyLarge,
+          children: [TextSpan(text: widget.elementToTag(e))],
         ),
-      );
-    }
+      ),
+    );
+
+    List<ListTile> ret = [];
 
     categoryMap.keys.toList()
       ..sort((a, b) => categoryIdToName[a]!.toLowerCase().compareTo(categoryIdToName[b]!.toLowerCase()))
@@ -78,20 +72,21 @@ class _SearchableListview<T> extends State<Searchablelistview<T>> {
         items.sort((T a, T b) {
           return widget.elementToTag(a).toLowerCase().compareTo(widget.elementToTag(b).toLowerCase());
         });
-        ret.addAll(
-          items.map(
-            (e) => widget.elementToListTile(
-              e,
-              RichText(
-                text: TextSpan(
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  children: [TextSpan(text: widget.elementToTag(e))],
-                ),
-              ),
+        ret.addAll(items.map(toTile));
+      });
+
+    if (uncategorizedElements.isNotEmpty) {
+      if (widget.uncategorizedLabel != null) {
+        ret.add(
+          ListTile(
+            title: Center(
+              child: Text(widget.uncategorizedLabel!, style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
         );
-      });
+      }
+      ret.addAll(uncategorizedElements.map(toTile));
+    }
 
     return ret;
   }
@@ -192,6 +187,7 @@ class Searchablelistview<T> extends StatefulWidget {
   final String Function(T) elementToTag;
   final void Function(String)? newElement;
   final Future<List<(String, String)>> Function(T)? elementCategories;
+  final String? uncategorizedLabel;
 
   const Searchablelistview({
     required this.elements,
@@ -200,6 +196,7 @@ class Searchablelistview<T> extends StatefulWidget {
     this.newElement,
     this.elementsOnSearch,
     this.elementCategories,
+    this.uncategorizedLabel,
     super.key,
   });
 
