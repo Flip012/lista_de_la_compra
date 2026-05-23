@@ -48,6 +48,7 @@ abstract class ProductProvider implements VoidEventSource {
             updatedAt: Value(serializedProduct["updatedAt"]),
             deletedAt: Value(serializedProduct["deletedAt"]),
             enviromentId: Value(serializedProduct["enviromentId"]),
+            amount: serializedProduct.containsKey("amount") ? Value(serializedProduct["amount"]) : const Value.absent(),
           ),
         );
     notifyListeners();
@@ -72,6 +73,7 @@ abstract class ProductProvider implements VoidEventSource {
         needed: Value(serializedProduct["needed"]),
         updatedAt: Value(serializedProduct["updatedAt"]),
         deletedAt: Value(serializedProduct["deletedAt"]),
+        amount: serializedProduct.containsKey("amount") ? Value(serializedProduct["amount"]) : const Value.absent(),
       ),
     );
 
@@ -102,6 +104,16 @@ abstract class ProductProvider implements VoidEventSource {
     await (database.update(
       database.products,
     )..where((table) => table.id.equals(id))).write(ProductsCompanion(name: Value(name), updatedAt: Value(DateTime.now().millisecondsSinceEpoch)));
+
+    notifyListeners();
+  }
+
+  Future setProductAmount(String id, String? amount) async {
+    final database = AppDatabaseSingleton.instance;
+    final String? normalized = (amount != null && amount.trim().isEmpty) ? null : amount?.trim();
+    await (database.update(
+      database.products,
+    )..where((table) => table.id.equals(id))).write(ProductsCompanion(amount: Value(normalized), updatedAt: Value(DateTime.now().millisecondsSinceEpoch)));
 
     notifyListeners();
   }

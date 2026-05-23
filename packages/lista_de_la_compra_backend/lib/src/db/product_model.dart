@@ -8,6 +8,7 @@ class Products extends Table {
   TextColumn get id => text().clientDefault(() => Uuid().v7())();
   TextColumn get name => text()();
   BoolColumn get needed => boolean()();
+  TextColumn get amount => text().nullable()();
   IntColumn get updatedAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
   IntColumn get deletedAt => integer().nullable()();
   TextColumn get enviromentId => text().references(Enviroments, #id)();
