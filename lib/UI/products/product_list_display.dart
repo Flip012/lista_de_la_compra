@@ -37,7 +37,18 @@ class ProductListDisplay extends StatelessWidget {
           elementToListTile: (Product p, RichText tag) {
             return ListTile(
               title: tag,
-              subtitle: ProductAmount(p.id),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ProductAmount(p.id),
+                  if ((p.lastEditedBy ?? '').isNotEmpty)
+                    Text(
+                      p.lastEditedBy!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
+                    ),
+                ],
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

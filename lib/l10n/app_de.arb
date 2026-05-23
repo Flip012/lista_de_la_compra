@@ -375,6 +375,7 @@
     }
   },
   "noAisleAssigned": "Kein Gang zugewiesen",
+  "lastEditedBy": "Zuletzt geändert von",
   "numberOfAisles": "{count, plural, =0{Keine Gänge} =1{1 Gang} other{{count} Gänge}}",
   "@numberOfAisles": {
     "description": "Pluralized message for number of aisles. Intended to be used where aisle counts are shown. Not referenced directly in codebase currently.",

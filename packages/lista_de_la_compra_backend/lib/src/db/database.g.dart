@@ -1111,6 +1111,17 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _lastEditedByMeta = const VerificationMeta(
+    'lastEditedBy',
+  );
+  @override
+  late final GeneratedColumn<String> lastEditedBy = GeneratedColumn<String>(
+    'last_edited_by',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1120,6 +1131,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     deletedAt,
     enviromentId,
     amount,
+    lastEditedBy,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1181,6 +1193,15 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
       );
     }
+    if (data.containsKey('last_edited_by')) {
+      context.handle(
+        _lastEditedByMeta,
+        lastEditedBy.isAcceptableOrUnknown(
+          data['last_edited_by']!,
+          _lastEditedByMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1218,6 +1239,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}amount'],
       ),
+      lastEditedBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_edited_by'],
+      ),
     );
   }
 
@@ -1235,6 +1260,7 @@ class Product extends DataClass implements Insertable<Product> {
   final int? deletedAt;
   final String enviromentId;
   final String? amount;
+  final String? lastEditedBy;
   const Product({
     required this.id,
     required this.name,
@@ -1243,6 +1269,7 @@ class Product extends DataClass implements Insertable<Product> {
     this.deletedAt,
     required this.enviromentId,
     this.amount,
+    this.lastEditedBy,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1257,6 +1284,9 @@ class Product extends DataClass implements Insertable<Product> {
     map['enviroment_id'] = Variable<String>(enviromentId);
     if (!nullToAbsent || amount != null) {
       map['amount'] = Variable<String>(amount);
+    }
+    if (!nullToAbsent || lastEditedBy != null) {
+      map['last_edited_by'] = Variable<String>(lastEditedBy);
     }
     return map;
   }
@@ -1274,6 +1304,9 @@ class Product extends DataClass implements Insertable<Product> {
       amount: amount == null && nullToAbsent
           ? const Value.absent()
           : Value(amount),
+      lastEditedBy: lastEditedBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastEditedBy),
     );
   }
 
@@ -1290,6 +1323,7 @@ class Product extends DataClass implements Insertable<Product> {
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       enviromentId: serializer.fromJson<String>(json['enviromentId']),
       amount: serializer.fromJson<String?>(json['amount']),
+      lastEditedBy: serializer.fromJson<String?>(json['lastEditedBy']),
     );
   }
   @override
@@ -1303,6 +1337,7 @@ class Product extends DataClass implements Insertable<Product> {
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'enviromentId': serializer.toJson<String>(enviromentId),
       'amount': serializer.toJson<String?>(amount),
+      'lastEditedBy': serializer.toJson<String?>(lastEditedBy),
     };
   }
 
@@ -1314,6 +1349,7 @@ class Product extends DataClass implements Insertable<Product> {
     Value<int?> deletedAt = const Value.absent(),
     String? enviromentId,
     Value<String?> amount = const Value.absent(),
+    Value<String?> lastEditedBy = const Value.absent(),
   }) => Product(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -1322,6 +1358,7 @@ class Product extends DataClass implements Insertable<Product> {
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
     enviromentId: enviromentId ?? this.enviromentId,
     amount: amount.present ? amount.value : this.amount,
+    lastEditedBy: lastEditedBy.present ? lastEditedBy.value : this.lastEditedBy,
   );
   Product copyWithCompanion(ProductsCompanion data) {
     return Product(
@@ -1334,6 +1371,9 @@ class Product extends DataClass implements Insertable<Product> {
           ? data.enviromentId.value
           : this.enviromentId,
       amount: data.amount.present ? data.amount.value : this.amount,
+      lastEditedBy: data.lastEditedBy.present
+          ? data.lastEditedBy.value
+          : this.lastEditedBy,
     );
   }
 
@@ -1346,7 +1386,8 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('enviromentId: $enviromentId, ')
-          ..write('amount: $amount')
+          ..write('amount: $amount, ')
+          ..write('lastEditedBy: $lastEditedBy')
           ..write(')'))
         .toString();
   }
@@ -1360,6 +1401,7 @@ class Product extends DataClass implements Insertable<Product> {
     deletedAt,
     enviromentId,
     amount,
+    lastEditedBy,
   );
   @override
   bool operator ==(Object other) =>
@@ -1371,7 +1413,8 @@ class Product extends DataClass implements Insertable<Product> {
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
           other.enviromentId == this.enviromentId &&
-          other.amount == this.amount);
+          other.amount == this.amount &&
+          other.lastEditedBy == this.lastEditedBy);
 }
 
 class ProductsCompanion extends UpdateCompanion<Product> {
@@ -1382,6 +1425,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int?> deletedAt;
   final Value<String> enviromentId;
   final Value<String?> amount;
+  final Value<String?> lastEditedBy;
   final Value<int> rowid;
   const ProductsCompanion({
     this.id = const Value.absent(),
@@ -1391,6 +1435,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.deletedAt = const Value.absent(),
     this.enviromentId = const Value.absent(),
     this.amount = const Value.absent(),
+    this.lastEditedBy = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProductsCompanion.insert({
@@ -1401,6 +1446,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.deletedAt = const Value.absent(),
     required String enviromentId,
     this.amount = const Value.absent(),
+    this.lastEditedBy = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : name = Value(name),
        needed = Value(needed),
@@ -1413,6 +1459,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<int>? deletedAt,
     Expression<String>? enviromentId,
     Expression<String>? amount,
+    Expression<String>? lastEditedBy,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1423,6 +1470,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (enviromentId != null) 'enviroment_id': enviromentId,
       if (amount != null) 'amount': amount,
+      if (lastEditedBy != null) 'last_edited_by': lastEditedBy,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1435,6 +1483,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<int?>? deletedAt,
     Value<String>? enviromentId,
     Value<String?>? amount,
+    Value<String?>? lastEditedBy,
     Value<int>? rowid,
   }) {
     return ProductsCompanion(
@@ -1445,6 +1494,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       deletedAt: deletedAt ?? this.deletedAt,
       enviromentId: enviromentId ?? this.enviromentId,
       amount: amount ?? this.amount,
+      lastEditedBy: lastEditedBy ?? this.lastEditedBy,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1473,6 +1523,9 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (amount.present) {
       map['amount'] = Variable<String>(amount.value);
     }
+    if (lastEditedBy.present) {
+      map['last_edited_by'] = Variable<String>(lastEditedBy.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1489,6 +1542,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('deletedAt: $deletedAt, ')
           ..write('enviromentId: $enviromentId, ')
           ..write('amount: $amount, ')
+          ..write('lastEditedBy: $lastEditedBy, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4671,6 +4725,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<int?> deletedAt,
       required String enviromentId,
       Value<String?> amount,
+      Value<String?> lastEditedBy,
       Value<int> rowid,
     });
 typedef $$ProductsTableUpdateCompanionBuilder =
@@ -4682,6 +4737,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<int?> deletedAt,
       Value<String> enviromentId,
       Value<String?> amount,
+      Value<String?> lastEditedBy,
       Value<int> rowid,
     });
 
@@ -4784,6 +4840,11 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<String> get amount => $composableBuilder(
     column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastEditedBy => $composableBuilder(
+    column: $table.lastEditedBy,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4900,6 +4961,11 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get lastEditedBy => $composableBuilder(
+    column: $table.lastEditedBy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$EnviromentsTableOrderingComposer get enviromentId {
     final $$EnviromentsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4950,6 +5016,11 @@ class $$ProductsTableAnnotationComposer
 
   GeneratedColumn<String> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get lastEditedBy => $composableBuilder(
+    column: $table.lastEditedBy,
+    builder: (column) => column,
+  );
 
   $$EnviromentsTableAnnotationComposer get enviromentId {
     final $$EnviromentsTableAnnotationComposer composer = $composerBuilder(
@@ -5064,6 +5135,7 @@ class $$ProductsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 Value<String> enviromentId = const Value.absent(),
                 Value<String?> amount = const Value.absent(),
+                Value<String?> lastEditedBy = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductsCompanion(
                 id: id,
@@ -5073,6 +5145,7 @@ class $$ProductsTableTableManager
                 deletedAt: deletedAt,
                 enviromentId: enviromentId,
                 amount: amount,
+                lastEditedBy: lastEditedBy,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5084,6 +5157,7 @@ class $$ProductsTableTableManager
                 Value<int?> deletedAt = const Value.absent(),
                 required String enviromentId,
                 Value<String?> amount = const Value.absent(),
+                Value<String?> lastEditedBy = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProductsCompanion.insert(
                 id: id,
@@ -5093,6 +5167,7 @@ class $$ProductsTableTableManager
                 deletedAt: deletedAt,
                 enviromentId: enviromentId,
                 amount: amount,
+                lastEditedBy: lastEditedBy,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

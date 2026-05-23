@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
     final FlutterScheduleProvider scheduleProvider = FlutterScheduleProvider();
     final FlutterHttpServerProvider httpServerProvider = FlutterHttpServerProvider();
     final PersistantSharedPreferencesProvider sharedPreferencesProvider = PersistantSharedPreferencesProvider(context);
+    productProvider.nickSource = sharedPreferencesProvider;
     final FlutterOpenConnectionProvider openConnectionProvider = FlutterOpenConnectionProvider();
     final FlutterSuperMarketProvider supermarketProvider = FlutterSuperMarketProvider();
     final FlutterAisleProvider aisleProvider = FlutterAisleProvider();

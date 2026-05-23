@@ -292,6 +292,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noAisleAssigned => 'Sin pasillo asignado';
 
   @override
+  String get lastEditedBy => 'Última edición por';
+
+  @override
   String numberOfProducts(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
