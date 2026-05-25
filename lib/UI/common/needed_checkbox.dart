@@ -127,9 +127,8 @@ class _NeededCheckboxState extends State<NeededCheckbox> {
           Product p = asyncSnapshot.data!;
 
           return Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              if (!(displayedValue ?? !p.needed)) Text(appLoc.toBuy),
-
               Checkbox(
                 value: displayedValue ?? !p.needed,
                 onChanged: (bool? notNeeded) async {
