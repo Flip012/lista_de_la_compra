@@ -138,6 +138,8 @@ class _SearchableListview<T> extends State<Searchablelistview<T>> {
                      children: [Icon(Icons.format_list_bulleted_add), SizedBox.fromSize(size: Size.square(10)) ,Text("${appLoc.add} \"$filter\"")]),
                   onPressed: () {
                     widget.newElement!(filter);
+                    _textEditingController.clear();
+                    onChanged("");
                   },
                 ),
               ),
