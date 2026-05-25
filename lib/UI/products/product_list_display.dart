@@ -37,15 +37,16 @@ class ProductListDisplay extends StatelessWidget {
           elementToListTile: (Product p, RichText tag) {
             return ListTile(
               title: tag,
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+              subtitle: Row(
                 children: [
                   ProductAmount(p.id),
                   if ((p.lastEditedBy ?? '').isNotEmpty)
-                    Text(
-                      p.lastEditedBy!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
+                    Expanded(
+                      child: Text(
+                        " - ${p.lastEditedBy!}",
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
+                      ),
                     ),
                 ],
               ),
