@@ -9,6 +9,7 @@ class Aisles extends Table {
   TextColumn get marketId => text().references(SuperMarkets, #id)();
   IntColumn get updatedAt => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
   IntColumn get deletedAt => integer().nullable()();
+  IntColumn get sortOrder => integer().clientDefault(() => DateTime.now().millisecondsSinceEpoch)();
 
   @override
   Set<Column<Object>> get primaryKey => {id};

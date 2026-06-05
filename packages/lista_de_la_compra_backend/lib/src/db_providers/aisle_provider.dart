@@ -18,6 +18,7 @@ abstract class AisleProvider implements VoidEventSource {
             marketId: Value(serialized["marketId"]),
             updatedAt: Value(serialized["updatedAt"]),
             deletedAt: Value(serialized["deletedAt"]),
+            sortOrder: serialized.containsKey("sortOrder") ? Value(serialized["sortOrder"]) : const Value.absent(),
           ),
         );
 
@@ -41,6 +42,7 @@ abstract class AisleProvider implements VoidEventSource {
         marketId: Value(serialized["marketId"]),
         updatedAt: Value(serialized["updatedAt"]),
         deletedAt: Value(serialized["deletedAt"]),
+        sortOrder: serialized.containsKey("sortOrder") ? Value(serialized["sortOrder"]) : const Value.absent(),
       ),
     );
 
@@ -95,9 +97,24 @@ abstract class AisleProvider implements VoidEventSource {
 
     final q = database.select(database.aisles)..where((t) => t.marketId.equals(marketId));
     q.where((t) => t.deletedAt.isNull());
-    q.orderBy([(u) => OrderingTerm(expression: u.name, mode: OrderingMode.asc)]);
+    q.orderBy([(u) => OrderingTerm(expression: u.sortOrder, mode: OrderingMode.asc)]);
 
     return await q.get();
+  }
+
+  Future<void> reorderAisles(List<String> orderedIds) async {
+    final database = AppDatabaseSingleton.instance;
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    await database.transaction(() async {
+      for (int i = 0; i < orderedIds.length; i++) {
+        await (database.update(database.aisles)..where((t) => t.id.equals(orderedIds[i]))).write(
+          AislesCompanion(sortOrder: Value(i), updatedAt: Value(now)),
+        );
+      }
+    });
+
+    notifyListeners();
   }
 
   Future<void> deleteById(String supermarketId) async {

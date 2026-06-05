@@ -2691,6 +2691,18 @@ class $AislesTable extends Aisles with TableInfo<$AislesTable, Aisle> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now().millisecondsSinceEpoch,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2698,6 +2710,7 @@ class $AislesTable extends Aisles with TableInfo<$AislesTable, Aisle> {
     marketId,
     updatedAt,
     deletedAt,
+    sortOrder,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2742,6 +2755,12 @@ class $AislesTable extends Aisles with TableInfo<$AislesTable, Aisle> {
         deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
       );
     }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
     return context;
   }
 
@@ -2771,6 +2790,10 @@ class $AislesTable extends Aisles with TableInfo<$AislesTable, Aisle> {
         DriftSqlType.int,
         data['${effectivePrefix}deleted_at'],
       ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
     );
   }
 
@@ -2786,12 +2809,14 @@ class Aisle extends DataClass implements Insertable<Aisle> {
   final String marketId;
   final int updatedAt;
   final int? deletedAt;
+  final int sortOrder;
   const Aisle({
     required this.id,
     required this.name,
     required this.marketId,
     required this.updatedAt,
     this.deletedAt,
+    required this.sortOrder,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2803,6 +2828,7 @@ class Aisle extends DataClass implements Insertable<Aisle> {
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<int>(deletedAt);
     }
+    map['sort_order'] = Variable<int>(sortOrder);
     return map;
   }
 
@@ -2815,6 +2841,7 @@ class Aisle extends DataClass implements Insertable<Aisle> {
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
+      sortOrder: Value(sortOrder),
     );
   }
 
@@ -2829,6 +2856,7 @@ class Aisle extends DataClass implements Insertable<Aisle> {
       marketId: serializer.fromJson<String>(json['marketId']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
   @override
@@ -2840,6 +2868,7 @@ class Aisle extends DataClass implements Insertable<Aisle> {
       'marketId': serializer.toJson<String>(marketId),
       'updatedAt': serializer.toJson<int>(updatedAt),
       'deletedAt': serializer.toJson<int?>(deletedAt),
+      'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
 
@@ -2849,12 +2878,14 @@ class Aisle extends DataClass implements Insertable<Aisle> {
     String? marketId,
     int? updatedAt,
     Value<int?> deletedAt = const Value.absent(),
+    int? sortOrder,
   }) => Aisle(
     id: id ?? this.id,
     name: name ?? this.name,
     marketId: marketId ?? this.marketId,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    sortOrder: sortOrder ?? this.sortOrder,
   );
   Aisle copyWithCompanion(AislesCompanion data) {
     return Aisle(
@@ -2863,6 +2894,7 @@ class Aisle extends DataClass implements Insertable<Aisle> {
       marketId: data.marketId.present ? data.marketId.value : this.marketId,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
     );
   }
 
@@ -2873,13 +2905,15 @@ class Aisle extends DataClass implements Insertable<Aisle> {
           ..write('name: $name, ')
           ..write('marketId: $marketId, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('sortOrder: $sortOrder')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, marketId, updatedAt, deletedAt);
+  int get hashCode =>
+      Object.hash(id, name, marketId, updatedAt, deletedAt, sortOrder);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2888,7 +2922,8 @@ class Aisle extends DataClass implements Insertable<Aisle> {
           other.name == this.name &&
           other.marketId == this.marketId &&
           other.updatedAt == this.updatedAt &&
-          other.deletedAt == this.deletedAt);
+          other.deletedAt == this.deletedAt &&
+          other.sortOrder == this.sortOrder);
 }
 
 class AislesCompanion extends UpdateCompanion<Aisle> {
@@ -2897,6 +2932,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
   final Value<String> marketId;
   final Value<int> updatedAt;
   final Value<int?> deletedAt;
+  final Value<int> sortOrder;
   final Value<int> rowid;
   const AislesCompanion({
     this.id = const Value.absent(),
@@ -2904,6 +2940,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
     this.marketId = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.sortOrder = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   AislesCompanion.insert({
@@ -2912,6 +2949,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
     required String marketId,
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.sortOrder = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : name = Value(name),
        marketId = Value(marketId);
@@ -2921,6 +2959,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
     Expression<String>? marketId,
     Expression<int>? updatedAt,
     Expression<int>? deletedAt,
+    Expression<int>? sortOrder,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2929,6 +2968,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
       if (marketId != null) 'market_id': marketId,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (sortOrder != null) 'sort_order': sortOrder,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2939,6 +2979,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
     Value<String>? marketId,
     Value<int>? updatedAt,
     Value<int?>? deletedAt,
+    Value<int>? sortOrder,
     Value<int>? rowid,
   }) {
     return AislesCompanion(
@@ -2947,6 +2988,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
       marketId: marketId ?? this.marketId,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
+      sortOrder: sortOrder ?? this.sortOrder,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2969,6 +3011,9 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
     if (deletedAt.present) {
       map['deleted_at'] = Variable<int>(deletedAt.value);
     }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2983,6 +3028,7 @@ class AislesCompanion extends UpdateCompanion<Aisle> {
           ..write('marketId: $marketId, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
+          ..write('sortOrder: $sortOrder, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -6322,6 +6368,7 @@ typedef $$AislesTableCreateCompanionBuilder =
       required String marketId,
       Value<int> updatedAt,
       Value<int?> deletedAt,
+      Value<int> sortOrder,
       Value<int> rowid,
     });
 typedef $$AislesTableUpdateCompanionBuilder =
@@ -6331,6 +6378,7 @@ typedef $$AislesTableUpdateCompanionBuilder =
       Value<String> marketId,
       Value<int> updatedAt,
       Value<int?> deletedAt,
+      Value<int> sortOrder,
       Value<int> rowid,
     });
 
@@ -6402,6 +6450,11 @@ class $$AislesTableFilterComposer
 
   ColumnFilters<int> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6483,6 +6536,11 @@ class $$AislesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$SuperMarketsTableOrderingComposer get marketId {
     final $$SuperMarketsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -6527,6 +6585,9 @@ class $$AislesTableAnnotationComposer
 
   GeneratedColumn<int> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
 
   $$SuperMarketsTableAnnotationComposer get marketId {
     final $$SuperMarketsTableAnnotationComposer composer = $composerBuilder(
@@ -6610,6 +6671,7 @@ class $$AislesTableTableManager
                 Value<String> marketId = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int?> deletedAt = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AislesCompanion(
                 id: id,
@@ -6617,6 +6679,7 @@ class $$AislesTableTableManager
                 marketId: marketId,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                sortOrder: sortOrder,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -6626,6 +6689,7 @@ class $$AislesTableTableManager
                 required String marketId,
                 Value<int> updatedAt = const Value.absent(),
                 Value<int?> deletedAt = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => AislesCompanion.insert(
                 id: id,
@@ -6633,6 +6697,7 @@ class $$AislesTableTableManager
                 marketId: marketId,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                sortOrder: sortOrder,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
