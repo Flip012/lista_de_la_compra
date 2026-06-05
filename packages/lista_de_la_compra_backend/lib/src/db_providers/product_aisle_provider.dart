@@ -6,6 +6,10 @@ import '../../lista_de_la_compra_backend.dart';
 class RamProductAisleProvider extends ProductAisleProvider with VoidEventSourceMixin {}
 
 abstract class ProductAisleProvider implements VoidEventSource {
+  /// Sibling product provider used to bump the product's lastEditedBy/updatedAt
+  /// after a *local* aisle-membership change. Left null on headless instances.
+  ProductProvider? productProvider;
+
   Future<void> syncAddProductAisle(Map<String, dynamic> serialized) async {
     final database = AppDatabaseSingleton.instance;
 
@@ -121,6 +125,7 @@ abstract class ProductAisleProvider implements VoidEventSource {
           ),
         );
 
+    await productProvider?.touchProduct(productId);
     notifyListeners();
     return id;
   }
@@ -175,6 +180,9 @@ abstract class ProductAisleProvider implements VoidEventSource {
       await (database.update(database.productAisles)..where((tbl) => tbl.id.equals(row.id))).write(ProductAislesCompanion(deletedAt: Value(now)));
     }
 
+    if (existing.isNotEmpty) {
+      await productProvider?.touchProduct(productId);
+    }
     notifyListeners();
   }
 
