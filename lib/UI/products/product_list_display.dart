@@ -21,6 +21,7 @@ class ProductListDisplay extends StatelessWidget {
     final ProductProvider productProvider = context.watch<FlutterProductProvider>();
     final SharedPreferencesProvider sharedPreferencesProvider = context.watch<PersistantSharedPreferencesProvider>();
     final ProductAisleProvider productAisleProvider = context.watch<FlutterProductAisleProvider>();
+    final AisleProvider aisleProvider = context.watch<FlutterAisleProvider>();
 
     var filteredProducts = isNeededList ? products.where((e) => e.needed).toList() : products;
 
@@ -70,8 +71,68 @@ class ProductListDisplay extends StatelessWidget {
             if (allProducts.any((e) => e.name.toLowerCase() == name.toLowerCase())) {
               var referenced = allProducts.firstWhere((e) => e.name.toLowerCase() == name.toLowerCase());
               productProvider.setProductNeededness(referenced.id, isNeededList);
-            } else {
+              return;
+            }
+
+            String? selectedSupermarket = await sharedPreferencesProvider.getSelectedSupermarket(enviromentId);
+            List<Aisle> aisles = selectedSupermarket == null
+                ? const []
+                : await aisleProvider.getAislesBySupermarket(selectedSupermarket);
+
+            if (aisles.isEmpty || !context.mounted) {
               productProvider.addProduct(name, isNeededList, enviromentId);
+              return;
+            }
+
+            final Set<String> selectedAisleIds = {};
+            final Set<String>? picked = await showDialog<Set<String>>(
+              context: context,
+              builder: (dialogContext) {
+                return StatefulBuilder(
+                  builder: (dialogContext, setLocalState) {
+                    return AlertDialog(
+                      title: Text(name),
+                      content: SizedBox(
+                        width: double.maxFinite,
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
+                            for (final a in aisles)
+                              CheckboxListTile(
+                                title: Text(a.name),
+                                value: selectedAisleIds.contains(a.id),
+                                onChanged: (v) => setLocalState(() {
+                                  if (v == true) {
+                                    selectedAisleIds.add(a.id);
+                                  } else {
+                                    selectedAisleIds.remove(a.id);
+                                  }
+                                }),
+                              ),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(null),
+                          child: Text(appLoc.cancel),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(selectedAisleIds),
+                          child: Text(appLoc.add),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+
+            if (picked == null) return;
+
+            final productId = await productProvider.addProduct(name, isNeededList, enviromentId);
+            for (final aisleId in picked) {
+              await productAisleProvider.addProductAisle(productId, aisleId, enviromentId);
             }
           },
           elementCategories: (Product p) async {
