@@ -42,8 +42,30 @@ jobs:
             echo "No RELEASE_KEYSTORE_BASE64 secret set -> APK will be debug-signed"
             exit 0
           fi
-          echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
-          echo "RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          # Strip whitespace and any stray non-base64 chars (e.g. dotenv-style
+          # leading "RELEASE_KEYSTORE_BASE64=" or copy-paste artifacts).
+          OUT="$RUNNER_TEMP/release.jks"
+          printf %s "$RELEASE_KEYSTORE_BASE64" \
+            | tr -d '[:space:]' \
+            | sed 's/^RELEASE_KEYSTORE_BASE64=//' \
+            | base64 -d --ignore-garbage > "$OUT" 2>/tmp/b64.err || {
+              echo "::error::base64 decode of RELEASE_KEYSTORE_BASE64 failed:"
+              cat /tmp/b64.err
+              exit 1
+            }
+          if [ ! -s "$OUT" ]; then
+            echo "::error::decoded keystore is empty - check RELEASE_KEYSTORE_BASE64."
+            exit 1
+          fi
+          SIZE=$(stat -c %s "$OUT")
+          MAGIC=$(head -c4 "$OUT" | xxd -p)
+          echo "Keystore decoded: $SIZE bytes, leading bytes 0x$MAGIC"
+          # JKS files start with 0xFEEDFEED, PKCS12 with 0x3082 (DER SEQUENCE).
+          case "$MAGIC" in
+            feedfeed|3082*) ;;
+            *) echo "::warning::Leading bytes do not look like a JKS (feedfeed) or PKCS12 (3082) file. Build may fail." ;;
+          esac
+          echo "RELEASE_KEYSTORE_PATH=$OUT" >> "$GITHUB_ENV"
 
       - name: Build APK
         env:
