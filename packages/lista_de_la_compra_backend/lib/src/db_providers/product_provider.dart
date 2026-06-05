@@ -133,6 +133,21 @@ abstract class ProductProvider implements VoidEventSource {
     notifyListeners();
   }
 
+  /// Stamp the local nick (if any) and bump updatedAt on a product,
+  /// without changing any other field. Used by sibling providers when
+  /// something *about* the product changes (e.g. aisle membership) so
+  /// the product row reflects the editor.
+  Future<void> touchProduct(String productId) async {
+    final database = AppDatabaseSingleton.instance;
+    await (database.update(database.products)..where((t) => t.id.equals(productId))).write(
+      ProductsCompanion(
+        updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
+        lastEditedBy: Value(await _currentNick()),
+      ),
+    );
+    notifyListeners();
+  }
+
   Future<Product?> getProductById(String id) async {
     final database = AppDatabaseSingleton.instance;
 

@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
     final FlutterSuperMarketProvider supermarketProvider = FlutterSuperMarketProvider();
     final FlutterAisleProvider aisleProvider = FlutterAisleProvider();
     final FlutterProductAisleProvider productAisleProvider = FlutterProductAisleProvider();
+    productAisleProvider.productProvider = productProvider;
 
     final OpenConnectionManager openConnectionManager = OpenConnectionManager(
       openConnectionProvider,
