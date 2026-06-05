@@ -20,7 +20,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(QueryExecutor executor) : super(executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -66,6 +66,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         // version 4 records the nick of the last editor on products
         await customStatement('ALTER TABLE products ADD COLUMN last_edited_by TEXT;');
+      }
+      if (from < 5) {
+        // version 5 adds a manual sort order to aisles; seed with updated_at
+        // so existing aisles get a stable, sensible initial order.
+        await customStatement('ALTER TABLE aisles ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0;');
+        await customStatement('UPDATE aisles SET sort_order = updated_at;');
       }
     },
   );

@@ -23,6 +23,7 @@ class _SearchableListview<T> extends State<Searchablelistview<T>> {
   Future<List<ListTile>> getShowTilesWithoutFilter(List<T> elms) async {
     Map<String, List<T>> categoryMap = {};
     Map<String, String> categoryIdToName = {};
+    Map<String, int> categoryIdToSortKey = {};
     List<T> uncategorizedElements = [];
 
     elms.sort((a, b) => widget.elementToTag(a).toLowerCase().compareTo(widget.elementToTag(b).toLowerCase()));
@@ -32,6 +33,7 @@ class _SearchableListview<T> extends State<Searchablelistview<T>> {
         await widget.elementCategories!(element).then((categories) {
           for (var category in categories) {
             categoryIdToName[category.$1] = category.$2;
+            categoryIdToSortKey[category.$1] = category.$3;
             if (!categoryMap.containsKey(category.$1)) {
               categoryMap[category.$1] = [];
             }
@@ -59,7 +61,11 @@ class _SearchableListview<T> extends State<Searchablelistview<T>> {
     List<ListTile> ret = [];
 
     categoryMap.keys.toList()
-      ..sort((a, b) => categoryIdToName[a]!.toLowerCase().compareTo(categoryIdToName[b]!.toLowerCase()))
+      ..sort((a, b) {
+        final cmp = (categoryIdToSortKey[a] ?? 0).compareTo(categoryIdToSortKey[b] ?? 0);
+        if (cmp != 0) return cmp;
+        return categoryIdToName[a]!.toLowerCase().compareTo(categoryIdToName[b]!.toLowerCase());
+      })
       ..forEach((categoryId) {
         ret.add(
           ListTile(
@@ -188,7 +194,7 @@ class Searchablelistview<T> extends StatefulWidget {
   final ListTile Function(T, RichText) elementToListTile;
   final String Function(T) elementToTag;
   final void Function(String)? newElement;
-  final Future<List<(String, String)>> Function(T)? elementCategories;
+  final Future<List<(String, String, int)>> Function(T)? elementCategories;
   final String? uncategorizedLabel;
 
   const Searchablelistview({
