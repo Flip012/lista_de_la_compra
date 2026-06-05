@@ -5,6 +5,16 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val releaseKeystorePath: String? = System.getenv("RELEASE_KEYSTORE_PATH")
+val releaseKeystorePassword: String? = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+val releaseKeyPassword: String? = System.getenv("RELEASE_KEY_PASSWORD")
+val releaseKeyAlias: String? = System.getenv("RELEASE_KEY_ALIAS")
+val hasReleaseSigning =
+    !releaseKeystorePath.isNullOrBlank() &&
+        !releaseKeystorePassword.isNullOrBlank() &&
+        !releaseKeyPassword.isNullOrBlank() &&
+        !releaseKeyAlias.isNullOrBlank()
+
 android {
     namespace = "com.jaimegonzalezfabregas.shoppinglist"
     compileSdk = flutter.compileSdkVersion
@@ -30,12 +40,27 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseKeystorePath!!)
+                storePassword = releaseKeystorePassword
+                keyAlias = releaseKeyAlias!!
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                // No release keystore configured in env -> fall back to the
+                // debug key. Useful for local `flutter run --release` and for
+                // CI runs on branches that don't expose the secret.
+                signingConfigs.getByName("debug")
+            }
         }
     }
     ndkVersion = "28.2.13676358"
