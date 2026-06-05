@@ -5,10 +5,12 @@ on:
     branches:
       - master
 
-jobs:  
-  build:      
-    name: Build & Release 
-    runs-on: ubuntu-latest 
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
@@ -69,5 +71,5 @@ jobs:
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: ${{ env.VERSION }}
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
   
